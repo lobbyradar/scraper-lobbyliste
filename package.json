@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "scraper-lobbyliste",
+  "version": "0.1.0",
+  "description": "scraper for http://bundestag.de/dokumente/lobbyliste",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "yetzt <node@yetzt.me> (https://yetzt.me/)",
+  "license": "Public Domain",
+  "dependencies": {
+    "debug": "^2.1.0",
+    "minimist": "^1.1.0",
+    "mkdirp": "^0.5.0",
+    "moment": "^2.8.4",
+    "pdftxt": "0.0.6",
+    "request": "^2.48.0",
+    "scrapyard": "0.0.7",
+    "tmp": "0.0.24",
+    "xz": "^1.0.3"
+  }
+}
