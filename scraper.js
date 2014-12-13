@@ -328,6 +328,7 @@ var convert = function(data, fn){
 										break;
 									}
 								});
+								entry.source_url = PDFURL;
 								entries.push(entry);
 							});
 							return fn(null, entries);
