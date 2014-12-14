@@ -14,7 +14,7 @@
     "minimist": "^1.1.0",
     "mkdirp": "^0.5.0",
     "moment": "^2.8.4",
-    "pdftxt": "0.0.6",
+    "pdftxt": "0.0.7",
     "request": "^2.48.0",
     "scrapyard": "0.0.7",
     "tmp": "0.0.24",
