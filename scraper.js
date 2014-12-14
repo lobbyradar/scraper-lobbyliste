@@ -18,6 +18,9 @@ var pdftxt = require("pdftxt");
 var request = require("request");
 var scrapyard = require("scrapyard");
 
+// local modules
+var namejs = require(path.resolve(__dirname, "name.js"));
+
 // determine outdir
 var outdir = (argv._[0]) ? path.resolve(argv._[0]) : path.resolve(__dirname, "data");
 debug("outdir is %s", outdir);
@@ -32,20 +35,6 @@ var outfile = path.resolve(outdir, "lobbyliste."+moment().format("YYYYMMDD")+".j
 tmp.setGracefulCleanup();
 
 var regex_url = new RegExp("^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$","i");
-
-var regexes = [
-	new RegExp("^(Studien|Finanzwirtschaft|IfMTimisoara|und Notar|Staatsob\\.|RA in|SteuerberaterDr|und Dipl\\.-Betriebswirt|Recht II|CIA|CISA|CISM|CGEIT|LB|i\\.e\\.R\\.|u\\. Dipl|des Bergfachs|Master of Business Administration)[\\.\\-,\\s\\/]*"), // special cases
-	new RegExp(",?\\s*(MSA|OFM|MSc|MHA|M\\.A\\.|MPH|MdB|Ausschuss (.*)|[gG]eschäftsf.*|Präsident|Vorsitzender|SDB|Direktor.*|Wissenschaftlicher.*|MdEP|Honorargeneralkonsul|Schriftführerin|[0-9]+\\. Vorsitzender|Qualitätssicherung|Vorstand(.*))\s*$","i"), // appendixes
-	new RegExp("^(Psych|Dr|Prof|Dip(l(om)?)?|Ing|Inf|Hdl|PhD|Wirtsch(aft)?|Jur|M\\.Sc|sc|hum|arg|publ|stud|rer|agr|ret|nat|oec|pol|phil|soc|h\\.?\\s?c|med|vet|medic|uni(v)?|dent|habil|e\\.?\\s?h|m\\.?\\s?a|MSA|ass?|CCM|B\\.ec|Bau|Agraring|Bauing|hdl|inf|wirtsch|met|päd|soz|stat|theol|verw|wirts|hd|sdb|mdb|Ltd|MPhil|MLM|Mr|Msgr|OTL|PD|Parl|DI MAAS|Magister|mult|iur|math|pharm|MdEP|Sir|ZA|vBP|StB|lic)[\\.\\-,\\s\\/]+","i"),
-	new RegExp("\\((VWA|BA|FH|FA|TA|US|I|RUS|TH||staatl(ich|\\.)\\s?gepr(üft|\\.))\\)[\\.\\-,\\s\\/]*","i"),
-	new RegExp("^((Jurist|(Medizin)?pädagog|Verwaltungs-Wirt|Veterinär|Kauf|Generalleutnant|General|Generalarzt|Fregattenkapitän|Agrarbiolog|Amtsanw[aä]lt|Apotheker|Architekt|Assessor|Betriebswirt|Bischof( von [a-z]+)?|Botschafter|Buchprüfer|Bundesbankoberamtsrat|Bundesinnungsmeister|Bundesminister|Bundespräsident|Bundestagspräsident|Bürgermeister|Chefapotheker|Diakon|Dompropst|Augenoptiker|Optometrist|Biolog|Brennmeister|Chemiker|Designer|Finanzwirt|Forstwirt|Geograph|Geolog|Geophysiker|Handelslehrer|Holzwirt|Informatiker|Jurist|Kauf|Mathematiker|Medizinpädagog|Meteorolog|physiker|Politolog|Psycholog|Pädagog|Rechtspfleger|Restaurator|Sachverständig|Sozialpädagog|Sozialwirt|Sozialwissenschaftler|Soziolog|Stomatolog|Verwaltungsbetriebswirt|Verwaltungswirt|Verwaltungswissenschaftler|Volkswirt|Wirtschafts(ing)?|Wirtschaftsjurist|Ökonom|Übersetzer|Domkapitular|Probst|Finanzfachwirt|(Forst|Bau)assessor|Hauptfeldwebel|Hauptmann|Honorar|Honorargeneralkonsul|Honorarkonsul|Justizminister|Kapitän(leutnant)?|Konsul|Land(es)?rat|Landwirtschaftsmeister|Lohnsteuerberater|Landwirtschaftsdirektor|Luftverkehrskauf|Magistratsr[aä]t|Major|Minist|Ministerialdirektor|Ministerialdirigent|Monsignore|Notar|Oberamtsanw[aä]lt|Oberbürgermeister|Oberfeldarzt|Obermeister|Oberst|Oberstaatsanw[aä]lt|Oberstabsboots|Oberstabsfeldwebel|Oberstleutnant|Oberstudiendirektor|Staatssekretär|Parlamentarischer|Parlamentspräsident|Patentanw[aä]lt|Pfarrer|Politikwissenschaftler|Priv(\\.|at)-?Dozent|RA|Ran|Fachanwalt( für [a-z]+)?|Realschulrektor|Rechtsreferent|Regierungsamts(rat)?|Regionspräsident|Revieroberjäger|Richter(in)?( am [a-z]+)?|Senator|Staats(minister|sekretär)|Stabsfeldwebel|Stabshauptmann|(Steuer|Wirtschafts)(berater|prüfer)|Stuckateurmeister|Studiendirektor|Studienrat|Uni(v(ersitäts)?)?|Verleger|Rechtsjournalist|Rechtsjurist|Veterinärdirektor|Vizepräsident des Verwaltungsgerichts|Zahntechnikermeister|[AÄ]rzt)(er|e|in|mann|frau)?)[\\.\\-,\\s\\/]+","i"),
-	new RegExp("^(a\\.?\\s?D|d\\.?\\s?R|i\\.?\\s?G|i\\.?\\s?K)[\\.\\-,\\s\\/]+","i")
-];
-
-var namesake = function(str){
-	for (var i = 0; i < regexes.length; i++) if (regexes[i].test(str)) return namesake(str.replace(regexes[i],""));
-	return str;
-};
 
 var extract_addr = function(addr, addrtype, fn){
 
@@ -156,54 +145,11 @@ var extract_addr = function(addr, addrtype, fn){
 		
 };
 
-var extract_name = function(str) {
-	var name = namesake(str).replace(/^\s+|\s+$/,'');
-	if (name === "") return null;
-	var titles = str.replace(name, '');
-	return {
-		name: name.replace(/^\s+|\s+$/,'').replace(/\s+/g,' '),
-		titles: titles.replace(/^\s+|\s+$/,'').replace(/\s+/g,' ')
-	};
-}
-
 var extract_people = function(lines, type, fn){
-		
-	var people = [];
-	var head_position = null;
-	lines.forEach(function(line){
-	
-		if (/^\(s\. Abschnitt/.test(line) || line === "–") return;
-	
-		if (/:$/.test(line)) {
-			// title
-			head_position = line
-				.replace(/\b\s?[\/\-\s]{1,3}\s?\bin(nen)?/,'')
-				.replace(/[: ]+$/,'')
-				.replace(/mitglieder\b/g, 'mitglied')
-				.replace(/präsidenten\b/g, 'präsident')
-			return;
-		}
-		
-		if (/\b, ([^,]+)$/.test(line)) {
-			var position = line.replace(/^.*\b, ([^,]+)$/, "$1");
-			var line = line.replace(/\b, ([^,]+)$/, "");
-		}
-		
-		var person = extract_name(line);
-		
-		if (!person) return;
-		
-		person.type = type;
-		
-		if (position && position !== "") person.position = position;
-		else if (head_position && head_position !== "") person.position = head_position;
-		
-		people.push(person);
-		
-	});
-	
-	fn(null, people);
-	
+	fn(null, namejs(lines).map(function(person){
+		person.type=type;
+		return person;
+	}));
 };
 
 var convert = function(data, fn){
@@ -348,7 +294,7 @@ var convert = function(data, fn){
 		compressor.pipe(fs.createWriteStream(outfile).on("finish", function(){
 			debug("file saved to %s", path.basename(outfile));
 		}));
-		compressor.write(JSON.stringify(sets));
+		compressor.write(JSON.stringify(sets,null,'\t'));
 		compressor.end();
 	});
 });
