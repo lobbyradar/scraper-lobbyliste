@@ -215,7 +215,8 @@ var convert = function(data, fn){
 			members: null,
 			orgs: null,
 			description: null,
-			people: []
+			people: [],
+			source_url = entry.source_url
 		};
 		extract_addr(entry.addr, "main", function(err, addr){
 			if (err) debug("address extraction error %s", err);
