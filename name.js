@@ -137,7 +137,7 @@ module.exports = function(lines){
 
 		var titles = line.replace(name,'');
 		if (head_position !== null) titles+=" "+head_position;
-		titles = tiltes.replace(/\s+/g,' ').replace(/^[\s,\.\-]+|[\s,\.\-]+$/g,'');
+		titles = titles.replace(/\s+/g,' ').replace(/^[\s,\.\-]+|[\s,\.\-]+$/g,'');
 		
 		names.push({
 			name: fixed, 
