@@ -1,11 +1,11 @@
 # Scraper Lobbyliste
 
-Scraper for [http://bundestag.de/dokumente/lobbyliste](http://bundestag.de/dokumente/lobbyliste).
-The latest document will be downloaded, converted to JSON and compressed with LZMA.
+Scraper für die [Lobbyliste des Deutschen Bundestages](http://bundestag.de/dokumente/lobbyliste).
+Die letzte Fassung wird heruntergeladen, nach JSON konvertiert und mit LZMA komprimiert.
 
-## Install
+## Installation
 
-Make sure you have [node.js](https://nodejs.org/) or [io.js](https://nodejs.org/) and [nmp](https://www.npmjs.com/) installed.
+Stellen Sie sicher, dass [node.js](https://nodejs.org/) oder [io.js](https://nodejs.org/) installiert sind.
 
 ```
 git clone https://github.com/lobbyradar/scraper-lobbyliste.git
@@ -13,12 +13,12 @@ cd scraper-lobbyliste
 npm install
 ```
 
-## Run Scraper
+## Scraper ausführen
 
 ```
 DEBUG=scraper node ./scraper.js <data-dir>
 ```
 
-## License
+## Lizenz
 
-[This software is released into the public domain](http://unlicense.org/UNLICENSE).
+[Diese Software wurde in die Gemeinfreiheit entlassen](http://unlicense.org/UNLICENSE).
