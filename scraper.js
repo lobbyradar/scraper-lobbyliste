@@ -19,7 +19,7 @@ var request = require("request");
 var scrapyard = require("scrapyard");
 
 // local modules
-var namejs = require(path.resolve(__dirname, "name.js"));
+var namejs = require(path.resolve(__dirname, "lib/name.js"));
 
 // determine outdir
 var outdir = (argv._[0]) ? path.resolve(argv._[0]) : path.resolve(__dirname, "data");
@@ -36,6 +36,7 @@ tmp.setGracefulCleanup();
 
 var regex_url = new RegExp("^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$","i");
 
+// extract address information
 var extract_addr = function(addr, addrtype, fn){
 
 	if (/^(–|\-)?$/.test(addr[0])) return fn(null, null);
@@ -145,6 +146,7 @@ var extract_addr = function(addr, addrtype, fn){
 		
 };
 
+// extract and unify names
 var extract_people = function(lines, type, fn){
 	fn(null, namejs(lines).map(function(person){
 		person.type=type;
@@ -152,6 +154,7 @@ var extract_people = function(lines, type, fn){
 	}));
 };
 
+// convert raw date to structured data
 var convert = function(data, fn){
 	var sets = [];
 	data.forEach(function(entry){
@@ -214,6 +217,7 @@ var convert = function(data, fn){
 			cache: tmpdir,
 			bestbefore: "5min"
 		});
+		// scrape pdf
 		scraper.scrape({ url: BASEURL, type: "html" }, function(err, $){
 			if (err) return fn(err);
 			if ($('.linkliste .linkGeneric a[title^=Aktuelle]').length !== 1) return fn(new Error("Unable to locate PDF link"));
@@ -226,6 +230,7 @@ var convert = function(data, fn){
 				debug("saving to %s", TMPFILE);
 				this.pipe(fs.createWriteStream(TMPFILE)).on("finish", function(){
 					debug("download complete");
+					// extract pdf text
 					pdftxt(TMPFILE, function(err, data) {
 						if (err) return fn(err);
 						debug("pdf parsing complete");
@@ -260,6 +265,7 @@ var convert = function(data, fn){
 							data.forEach(function(blob){
 								var entry = {};
 								var type = "addr";
+								// iterate over data blobs
 								blob.forEach(function(item){
 									if (!entry.hasOwnProperty(type)) entry[type] = [];
 									switch (item) {
@@ -298,4 +304,3 @@ var convert = function(data, fn){
 		compressor.end();
 	});
 });
-
